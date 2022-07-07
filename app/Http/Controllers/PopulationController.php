@@ -65,7 +65,7 @@ class PopulationController extends Controller
             $population->save();
         }
 
-        $population = Population::whereBetween('year', [$firstYear, $lastYear])->get();
+        $population = Population::whereBetween('year', [$firstYear, $lastYear])->orderBy('year', 'ASC')->get();
         return response()->json($population, 200);
     }
 
