@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Population;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
 class PopulationController extends Controller
@@ -52,7 +53,7 @@ class PopulationController extends Controller
         $firstYear = $request->get('first_year') ?? 2013;
         $lastYear = $request->get('last_year') ?? 2018;
 
-        $response = Http::get('https://datausa.io/api/data?drilldowns=Nation&measures=Population');
+        /* $response = Http::get('https://datausa.io/api/data?drilldowns=Nation&measures=Population');
         foreach($response->json('data') as $data){
             $population = Population::query()->updateOrCreate([
                 'id_nation'     => $data['ID Nation'],
@@ -63,9 +64,14 @@ class PopulationController extends Controller
                 'slug_nation'   => $data['Slug Nation'],
             ]);
             $population->save();
-        }
+        } */
 
-        $population = Population::whereBetween('year', [$firstYear, $lastYear])->orderBy('year', 'ASC')->get();
+        if(Cache::has('population')){
+            $population = Cache::get('population');
+        }else{
+            $population = Population::whereBetween('year', [$firstYear, $lastYear])->orderBy('year', 'ASC')->get();
+            Cache::put('population', $population);
+        }
         return response()->json($population, 200);
     }
 

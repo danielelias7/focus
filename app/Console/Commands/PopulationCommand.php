@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 
 use App\Models\Population;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
 class PopulationCommand extends Command
@@ -45,6 +46,7 @@ class PopulationCommand extends Command
 
         if($response){
             $this->info('DB updated');
+            Cache::flush();
             return true;
         }else{
             $this->warn('No data');
